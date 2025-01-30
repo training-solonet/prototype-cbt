@@ -21,7 +21,7 @@ export default function TestPage() {
   
   // detectDevTools();
   disableTextActions();
-  detectSplitScreen();
+  // detectSplitScreen();
 
   useVisibility({
     onVisibilityHidden: () => {
