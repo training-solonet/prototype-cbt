@@ -1,36 +1,35 @@
 import Swal from "sweetalert2";
 
 const detectSplitScreenOnMobile = () => {
+  // Cek apakah perangkat adalah mobile
   const isMobile = () => {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   };
 
-  let previousWidth = window.innerWidth;
-  let previousHeight = window.innerHeight;
-
+  // Fungsi untuk mengecek split screen
   const checkSplitScreen = () => {
     if (!isMobile()) return;
 
-    const currentWidth = window.innerWidth;
-    const currentHeight = window.innerHeight;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
 
-    const widthChange = Math.abs(previousWidth - currentWidth);
-    const heightChange = Math.abs(previousHeight - currentHeight);
+    // Menentukan ukuran minimum normal (bisa disesuaikan)
+    const minWidth = 400;  // Jika kurang dari ini, kemungkinan split screen
+    const minHeight = 300; // Jika kurang dari ini, kemungkinan split screen
 
-    if (widthChange > 200 || heightChange > 200) {
+    if (width < minWidth || height < minHeight) {
       Swal.fire({
         icon: "warning",
         title: "Mode Split Screen Terdeteksi",
         text: "Aplikasi mungkin tidak tampil dengan benar di mode layar terpisah.",
       });
     }
-
-    previousWidth = currentWidth;
-    previousHeight = currentHeight;
   };
 
+  // Jalankan saat pertama kali halaman dimuat
   checkSplitScreen();
 
+  // Jalankan saat ukuran layar berubah (misal masuk/keluar split-screen)
   window.addEventListener("resize", checkSplitScreen);
 };
 
