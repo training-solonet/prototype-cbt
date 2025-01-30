@@ -15,9 +15,9 @@ export default function disableTextActions() {
     document.addEventListener("contextmenu", disableEvent);
 
     // Proteksi tambahan untuk handphone
-    document.addEventListener("touchstart", disableEvent); // Mencegah tap & hold
-    document.addEventListener("touchend", disableEvent);
-    document.addEventListener("touchmove", disableEvent);
+    // document.addEventListener("touchstart", disableEvent); // Mencegah tap & hold
+    // document.addEventListener("touchend", disableEvent);
+    // document.addEventListener("touchmove", disableEvent);
 
     return () => {
       document.removeEventListener("selectstart", disableEvent);
@@ -27,9 +27,9 @@ export default function disableTextActions() {
       document.removeEventListener("contextmenu", disableEvent);
 
       // Hapus event listener untuk sentuhan saat komponen di-unmount
-      document.removeEventListener("touchstart", disableEvent);
-      document.removeEventListener("touchend", disableEvent);
-      document.removeEventListener("touchmove", disableEvent);
+      // document.removeEventListener("touchstart", disableEvent);
+      // document.removeEventListener("touchend", disableEvent);
+      // document.removeEventListener("touchmove", disableEvent);
     };
   }, []);
 }
