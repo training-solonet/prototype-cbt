@@ -1,13 +1,13 @@
 import { useParams, useNavigate } from "react-router-dom";
 import examQuestions from "../utils/examQuestions";
 import QuestionNavigation from "../components/QuestionNavigation";
-import Question from "../components/Question";
+import Question, { QuestionType } from "../components/Question";
 import useVisibility from "../hooks/useVisibility";
 import useConnection from "../hooks/useConnection";
 import { useCountdown } from "../context/CountdownContext";
 import { useEffect } from "react";
 import disableTextActions from "../utils/disableTextAction";
-import detectSplitScreenOnMobile from "../utils/detectSplitScreen";
+import useDetectSplitScreen from "../hooks/useDetectSplitSceen";
 // import detectDevTools from "../utils/detectDevTools";
 
 export default function TestPage() {
@@ -21,7 +21,11 @@ export default function TestPage() {
   
   // detectDevTools();
   disableTextActions();
-  detectSplitScreenOnMobile();
+
+  useDetectSplitScreen({
+    alertOnSplitScreen: false,
+    navigateToOnSplitScreen: `/completed?message=Anda terdeteksi kecurangan! Anda sedang menggunakan mode split screen! Ujian otomatis selesai.&time=${formatTime(totalTimeTaken)}`,
+  })
 
   useVisibility({
     onVisibilityHidden: () => {
@@ -83,8 +87,8 @@ export default function TestPage() {
           handleNavigation={(newId: number) =>
             navigate(newId >= 1 && newId <= examQuestions.length ? `/test/${newId}` : "/test/1")
           }
-          question={question}
-          examQuestions={examQuestions}
+          question={question as QuestionType}
+          examQuestions={examQuestions as QuestionType[]}
         />
       </div>
 
@@ -93,7 +97,7 @@ export default function TestPage() {
         handleNavigation={(newId: number) =>
           navigate(newId >= 1 && newId <= examQuestions.length ? `/test/${newId}` : "/test/1")
         }
-        examQuestions={examQuestions}
+        examQuestions={examQuestions as QuestionType[]}
       />
     </div>
   );

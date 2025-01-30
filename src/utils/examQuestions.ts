@@ -1,75 +1,85 @@
 const examQuestions = [
   {
-    id: 1,
-    question: "Apa ibu kota Indonesia?",
-    options: ["Bandung", "Jakarta", "Surabaya", "Yogyakarta"],
-    answer: "Jakarta",
+    "id": 1,
+    "type": "multiple-choice",
+    "question": "<strong>Apa ibu kota Indonesia?</strong>",
+    "options": ["Bandung", "Jakarta", "Surabaya", "Yogyakarta"],
+    "answer": "Jakarta"
   },
   {
-    id: 2,
-    question: "Siapa penemu bola lampu?",
-    options: [
+    "id": 2,
+    "type": "multiple-choice",
+    "question": "<strong>Siapa penemu bola lampu?</strong>",
+    "options": [
       "Nikola Tesla",
       "Thomas Edison",
       "Alexander Graham Bell",
-      "Albert Einstein",
+      "Albert Einstein"
     ],
-    answer: "Thomas Edison",
+    "answer": "Thomas Edison"
   },
   {
-    id: 3,
-    question: "Berapa hasil dari 7 x 8?",
-    options: ["54", "56", "58", "60"],
-    answer: "56",
+    "id": 3,
+    "type": "multiple-choice",
+    "question": "<strong>Berapa hasil dari 7 x 8?</strong>",
+    "options": ["54", "56", "58", "60"],
+    "answer": "56"
   },
   {
-    id: 4,
-    question: "Apa lambang kimia untuk air?",
-    options: ["CO2", "H2O", "O2", "NaCl"],
-    answer: "H2O",
+    "id": 4,
+    "type": "multiple-choice",
+    "question": "<strong>Apa lambang kimia untuk air?</strong>",
+    "options": ["CO2", "H2O", "O2", "NaCl"],
+    "answer": "H2O"
   },
   {
-    id: 5,
-    question: "Siapa tokoh dalam novel 'Laskar Pelangi'?",
-    options: ["Ikal", "Andrea", "Lintang", "Mahar"],
-    answer: "Ikal",
+    "id": 5,
+    "type": "essay",
+    "question": "<strong>Jelaskan secara singkat makna dari Proklamasi Kemerdekaan Indonesia.</strong>",
+    "answer": "Proklamasi Kemerdekaan Indonesia adalah pernyataan resmi yang menyatakan bahwa Indonesia telah merdeka dari penjajahan dan menjadi negara yang berdaulat sejak 17 Agustus 1945."
   },
   {
-    id: 6,
-    question: "Apa planet terbesar di tata surya?",
-    options: ["Bumi", "Mars", "Jupiter", "Saturnus"],
-    answer: "Jupiter",
+    "id": 6,
+    "type": "multiple-choice",
+    "question": "<strong>Apa planet terbesar di tata surya?</strong>",
+    "options": ["Bumi", "Mars", "Jupiter", "Saturnus"],
+    "answer": "Jupiter"
   },
   {
-    id: 7,
-    question: "Kapan Proklamasi Kemerdekaan Indonesia terjadi?",
-    options: [
-      "17 Agustus 1945",
-      "20 Mei 1945",
-      "1 Juni 1945",
-      "28 Oktober 1945",
-    ],
-    answer: "17 Agustus 1945",
+    "id": 7,
+    "type": "multiple-choice",
+    "question": "<strong>Dengarkan rekaman berikut, kemudian tentukan siapa penyampai pidato tersebut.</strong>",
+    "media": {
+      "type": "audio",
+      "url": "/soalpidato.mp3"
+    },
+    "options": ["Soekarno", "Hatta", "Tan Malaka", "Sutan Sjahrir"],
+    "answer": "Soekarno"
   },
   {
-    id: 8,
-    question: "Berapa jumlah sisi pada segi lima?",
-    options: ["3", "4", "5", "6"],
-    answer: "5",
+    "id": 8,
+    "type": "multiple-choice",
+    "question": "<strong>Berapa jumlah sisi pada segi lima?</strong>",
+    "options": ["3", "4", "5", "6"],
+    "answer": "5"
   },
   {
-    id: 9,
-    question: "Siapa presiden pertama Indonesia?",
-    options: ["B.J. Habibie", "Soekarno", "Suharto", "Megawati Soekarnoputri"],
-    answer: "Soekarno",
+    "id": 9,
+    "type": "multiple-choice",
+    "question": "<strong>Lihat gambar berikut, kemudian tentukan bangun ruang yang ditampilkan.</strong>",
+    "media": {
+      "type": "image",
+      "url": "/soalbangunruang.webp"
+    },
+    "options": ["Kubus", "Balok", "Prisma", "Limas"],
+    "answer": "Kubus"
   },
   {
-    id: 10,
-    question:
-      "Apa bahasa pemrograman untuk pengembangan aplikasi web frontend?",
-    options: ["Python", "JavaScript", "C++", "Java"],
-    answer: "JavaScript",
-  },
+    "id": 10,
+    "type": "essay",
+    "question": "<strong>Jelaskan peran JavaScript dalam pengembangan web.</strong>",
+    "answer": "JavaScript adalah bahasa pemrograman yang digunakan untuk membuat elemen interaktif di dalam situs web, seperti animasi, validasi formulir, dan manipulasi DOM."
+  }
 ];
 
 export default examQuestions;
