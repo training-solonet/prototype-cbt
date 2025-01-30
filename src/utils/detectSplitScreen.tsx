@@ -5,19 +5,28 @@ const detectSplitScreenOnMobile = () => {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   };
 
+  let previousWidth = window.innerWidth;
+  let previousHeight = window.innerHeight;
+
   const checkSplitScreen = () => {
     if (!isMobile()) return;
 
-    const screenRatio = window.innerWidth / window.innerHeight;
-    const isSplit = screenRatio < 0.6 || screenRatio > 1.8;
+    const currentWidth = window.innerWidth;
+    const currentHeight = window.innerHeight;
 
-    if (isSplit) {
+    const widthChange = Math.abs(previousWidth - currentWidth);
+    const heightChange = Math.abs(previousHeight - currentHeight);
+
+    if (widthChange > 200 || heightChange > 200) {
       Swal.fire({
         icon: "warning",
         title: "Mode Split Screen Terdeteksi",
         text: "Aplikasi mungkin tidak tampil dengan benar di mode layar terpisah.",
       });
     }
+
+    previousWidth = currentWidth;
+    previousHeight = currentHeight;
   };
 
   checkSplitScreen();
