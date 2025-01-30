@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useCountdown } from "../context/CountdownContext";
-import Swal from "sweetalert2";
+// import Swal from "sweetalert2";
 
 export default function HomePage() {
   const navigate = useNavigate();

@@ -7,7 +7,7 @@ import useConnection from "../hooks/useConnection";
 import { useCountdown } from "../context/CountdownContext";
 import { useEffect } from "react";
 import disableTextActions from "../utils/disableTextAction";
-import detectDevTools from "../utils/detectDevTools";
+// import detectDevTools from "../utils/detectDevTools";
 
 export default function TestPage() {
   const { id } = useParams<{ id: string }>();
