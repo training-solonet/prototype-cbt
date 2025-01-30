@@ -7,6 +7,7 @@ import useConnection from "../hooks/useConnection";
 import { useCountdown } from "../context/CountdownContext";
 import { useEffect } from "react";
 import disableTextActions from "../utils/disableTextAction";
+import detectSplitScreen from "../utils/detectSplitScreen";
 // import detectDevTools from "../utils/detectDevTools";
 
 export default function TestPage() {
@@ -20,6 +21,7 @@ export default function TestPage() {
   
   // detectDevTools();
   disableTextActions();
+  detectSplitScreen();
 
   useVisibility({
     onVisibilityHidden: () => {

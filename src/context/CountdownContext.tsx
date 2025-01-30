@@ -18,7 +18,7 @@ const CountdownContext = createContext<CountdownContextType | undefined>(
 export const CountdownProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const time = 100;
+  const time = 60 * 60;
 
   const [timeLeft, setTimeLeft] = useState<number>(time);
   const [isRunning, setIsRunning] = useState<boolean>(false);
