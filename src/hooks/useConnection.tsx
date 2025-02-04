@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 type UseConnectionOptions = {
   onOnline?: () => void;
@@ -17,7 +18,15 @@ export default function useConnection({
   useEffect(() => {
     const handleOnline = () => {
       if (alertOnOnline) {
-        alert("Koneksi internet tersedia! Kamu akan diarahkan ke halaman selesai.");
+        Swal.fire({
+          title: "Peringatan!",
+          text: "Anda terdeteksi koneksi online! Laporkan ke pengawas untuk melanjutkan ujian anda.",
+          icon: "warning",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          showCancelButton: false,
+          showConfirmButton: false,
+        });
       }
 
       if (onOnline) {

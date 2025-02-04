@@ -1,17 +1,26 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCountdown } from "../context/CountdownContext";
+import examQuestions from "../utils/examQuestions";
 
 export default function ExamCompletedPage() {
   const nav = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const message = queryParams.get("message");
-  const time = queryParams.get("time");
 
-  const { resetCountdown } = useCountdown();
+  const { clearCountdown, remainingTime, formatTime, totalTimeTaken } =
+    useCountdown();
+
+  const savedAnswers = JSON.parse(localStorage.getItem("answersaved") || "[]");
+  const answeredQuestionsCount = savedAnswers.filter(
+    (ans: { id: number; answer: string | null }) =>
+      ans.answer !== null && ans.answer !== ""
+  ).length;
+
+  const unansweredQuestions = examQuestions.length - answeredQuestionsCount;
 
   const handleNav = () => {
-    resetCountdown();
+    clearCountdown();
     nav("/");
   };
 
@@ -24,14 +33,34 @@ export default function ExamCompletedPage() {
         </div>
       )}
 
+      <div className="bg-gray-100 p-4 rounded-lg shadow-md mb-4 text-sm font-medium w-full max-w-[90%] mx-auto">
+        <p className="flex justify-between">
+          <span>Total Soal:</span>
+          <span className="font-semibold">{examQuestions.length}</span>
+        </p>
+        <p className="flex justify-between">
+          <span>Soal Terjawab:</span>
+          <span className="font-semibold">{answeredQuestionsCount}</span>
+        </p>
+        <p className="flex justify-between">
+          <span>Soal Belum Terjawab:</span>
+          <span className="font-semibold">{unansweredQuestions}</span>
+        </p>
+        <p className="flex justify-between">
+          <span>Sisa Waktu:</span>
+          <span className="font-semibold">{formatTime(remainingTime)}</span>
+        </p>
+      </div>
+
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-[90%] w-full text-center">
         <h1 className="text-xl font-bold text-gray-800 mb-4">Ujian Selesai!</h1>
 
-        {time && (
-          <div className="text-center mb-4 text-sm font-medium">
-            <p>Anda telah menghabiskan waktu sebanyak {time} dalam ujian ini!</p>
-          </div>
-        )}
+        <div className="text-center mb-4 text-sm font-medium w-1/2 mx-auto">
+          <p>
+            Anda telah menghabiskan waktu sebanyak {formatTime(totalTimeTaken)}{" "}
+            dalam ujian ini!
+          </p>
+        </div>
 
         <p className="text-gray-600 text-sm">
           {message ? "" : "Terima kasih telah mengerjakan ujian ini."}

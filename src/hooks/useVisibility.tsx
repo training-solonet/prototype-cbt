@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 type UseVisibilityOptions = {
   onVisibilityHidden?: () => void;
@@ -18,7 +19,15 @@ export default function useVisibility({
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden") {
         if (alertOnVisibilityHidden) {
-          alert("Tab disembunyikan, kamu akan diarahkan ke halaman selesai.");
+          Swal.fire({
+            title: "Peringatan!",
+            text: "Anda terdeteksi berpindah tab/screen! Laporkan ke pengawas untuk melanjutkan anda.",
+            icon: "warning",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showCancelButton: false,
+            showConfirmButton: false,
+          });
         }
 
         if (onVisibilityHidden) {

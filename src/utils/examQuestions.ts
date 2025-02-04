@@ -2,14 +2,14 @@ const examQuestions = [
   {
     "id": 1,
     "type": "multiple-choice",
-    "question": "<strong>Apa ibu kota Indonesia?</strong>",
+    "question": "<span className='font-semibold'>Apa ibu kota Indonesia?</span>",
     "options": ["Bandung", "Jakarta", "Surabaya", "Yogyakarta"],
     "answer": "Jakarta"
   },
   {
     "id": 2,
     "type": "multiple-choice",
-    "question": "<strong>Siapa penemu bola lampu?</strong>",
+    "question": "<span className='font-semibold'>Siapa penemu bola lampu?</span>",
     "options": [
       "Nikola Tesla",
       "Thomas Edison",
@@ -21,34 +21,34 @@ const examQuestions = [
   {
     "id": 3,
     "type": "multiple-choice",
-    "question": "<strong>Berapa hasil dari 7 x 8?</strong>",
+    "question": "<span className='font-semibold'>Berapa hasil dari 7 x 8?</span>",
     "options": ["54", "56", "58", "60"],
     "answer": "56"
   },
   {
     "id": 4,
     "type": "multiple-choice",
-    "question": "<strong>Apa lambang kimia untuk air?</strong>",
+    "question": "<span className='font-semibold'>Apa lambang kimia untuk air?</span>",
     "options": ["CO2", "H2O", "O2", "NaCl"],
     "answer": "H2O"
   },
   {
     "id": 5,
     "type": "essay",
-    "question": "<strong>Jelaskan secara singkat makna dari Proklamasi Kemerdekaan Indonesia.</strong>",
+    "question": "<span className='font-semibold'>Jelaskan secara singkat makna dari Proklamasi Kemerdekaan Indonesia.</span>",
     "answer": "Proklamasi Kemerdekaan Indonesia adalah pernyataan resmi yang menyatakan bahwa Indonesia telah merdeka dari penjajahan dan menjadi negara yang berdaulat sejak 17 Agustus 1945."
   },
   {
     "id": 6,
     "type": "multiple-choice",
-    "question": "<strong>Apa planet terbesar di tata surya?</strong>",
+    "question": "<span className='font-semibold'>Apa planet terbesar di tata surya?</span>",
     "options": ["Bumi", "Mars", "Jupiter", "Saturnus"],
     "answer": "Jupiter"
   },
   {
     "id": 7,
     "type": "multiple-choice",
-    "question": "<strong>Dengarkan rekaman berikut, kemudian tentukan siapa penyampai pidato tersebut.</strong>",
+    "question": "<span className='font-semibold'>Dengarkan rekaman berikut, kemudian tentukan siapa penyampai pidato tersebut.</span>",
     "media": {
       "type": "audio",
       "url": "/soalpidato.mp3"
@@ -59,14 +59,14 @@ const examQuestions = [
   {
     "id": 8,
     "type": "multiple-choice",
-    "question": "<strong>Berapa jumlah sisi pada segi lima?</strong>",
+    "question": "<span className='font-semibold'>Berapa jumlah sisi pada segi lima?</span>",
     "options": ["3", "4", "5", "6"],
     "answer": "5"
   },
   {
     "id": 9,
     "type": "multiple-choice",
-    "question": "<strong>Lihat gambar berikut, kemudian tentukan bangun ruang yang ditampilkan.</strong>",
+    "question": "<span className='font-semibold'>Lihat gambar berikut, kemudian tentukan bangun ruang yang ditampilkan.</span>",
     "media": {
       "type": "image",
       "url": "/soalbangunruang.webp"
@@ -77,7 +77,7 @@ const examQuestions = [
   {
     "id": 10,
     "type": "essay",
-    "question": "<strong>Jelaskan peran JavaScript dalam pengembangan web.</strong>",
+    "question": "<span className='font-semibold'>Jelaskan peran JavaScript dalam pengembangan web.</span>",
     "answer": "JavaScript adalah bahasa pemrograman yang digunakan untuk membuat elemen interaktif di dalam situs web, seperti animasi, validasi formulir, dan manipulasi DOM."
   }
 ];

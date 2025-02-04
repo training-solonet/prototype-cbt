@@ -23,7 +23,7 @@ export default function useDetectSplitScreen({
 
       const width = window.innerWidth;
       const height = window.innerHeight;
-      const minWidth = 400;
+      const minWidth = 600;
       const minHeight = 300;
 
       if (width < minWidth || height < minHeight) {
@@ -41,11 +41,19 @@ export default function useDetectSplitScreen({
       }
     };
 
+    // Panggil checkSplitScreen pertama kali
     checkSplitScreen();
-    window.addEventListener("resize", checkSplitScreen);
+
+    // Event listener untuk resize
+    const handleResize = () => {
+      checkSplitScreen();
+    };
+
+    // Menambahkan event listener untuk resize
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener("resize", checkSplitScreen);
+      window.removeEventListener("resize", handleResize);
     };
   }, [navigate, alertOnSplitScreen, navigateToOnSplitScreen]);
 }

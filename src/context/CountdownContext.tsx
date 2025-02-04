@@ -4,11 +4,14 @@ import { decryptData, encryptData } from "../utils/encrypt";
 interface CountdownContextType {
   timeLeft: number;
   isRunning: boolean;
+  isTimeUp: boolean;
   startCountdown: () => void;
   stopCountdown: () => void;
   resetCountdown: () => void;
+  clearCountdown: () => void;
   formatTime: (seconds: number) => string;
   totalTimeTaken: number;
+  remainingTime: number;
 }
 
 const CountdownContext = createContext<CountdownContextType | undefined>(
@@ -18,34 +21,43 @@ const CountdownContext = createContext<CountdownContextType | undefined>(
 export const CountdownProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const time = 60 * 60;
+  const time = Date.now() + 60 * 60 * 1000;
+  const savedExamEndTime = localStorage.getItem("examEndTime");
+  const examEndTime = savedExamEndTime ? parseInt(savedExamEndTime) : time;
 
-  const [timeLeft, setTimeLeft] = useState<number>(time);
-  const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [timeLeft, setTimeLeft] = useState<number>(examEndTime - Date.now());
+  const [isRunning, setIsRunning] = useState<boolean>(true);
+  const [isTimeUp, setIsTimeUp] = useState<boolean>(false);
 
   useEffect(() => {
-    const savedTime = localStorage.getItem("timeLeft");
-    const savedStatus = localStorage.getItem("isRunning");
-
-    if (savedTime) {
-      const decryptedTime = decryptData(savedTime);
-      setTimeLeft(Number(decryptedTime));
+    if (!savedExamEndTime) {
+      localStorage.setItem("examEndTime", examEndTime.toString());
     }
+  }, [examEndTime, savedExamEndTime]);
 
-    if (savedStatus === "true") {
-      const decryptedStatus = decryptData(savedStatus);
-      setIsRunning(Boolean(decryptedStatus));
+  useEffect(() => {
+    const savedData = localStorage.getItem("countdown");
+
+    if (savedData) {
+      const decryptedData = decryptData(savedData);
+      const parsedData = JSON.parse(decryptedData);
+
+      setTimeLeft(parsedData.timeLeft);
+      setIsRunning(parsedData.isRunning);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("timeLeft", encryptData(String(timeLeft)));
-    localStorage.setItem("isRunning", encryptData(String(isRunning)));
+    const countdownData = JSON.stringify({ timeLeft, isRunning });
+    localStorage.setItem("countdown", encryptData(countdownData));
   }, [timeLeft, isRunning]);
 
   const startCountdown = () => {
-    if (isRunning || timeLeft === 0) return;
+    if (isRunning || timeLeft <= 0) return;
     setIsRunning(true);
+    localStorage.removeItem("examEndTime");
+    localStorage.removeItem("countdown");
+    localStorage.removeItem("answersaved");
   };
 
   const stopCountdown = () => {
@@ -54,29 +66,44 @@ export const CountdownProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const resetCountdown = () => {
     setIsRunning(false);
-    setTimeLeft(time);
+    setTimeLeft(examEndTime - Date.now());
+    localStorage.removeItem("examEndTime");
+    localStorage.removeItem("countdown");
+  };
+
+  const clearCountdown = () => {
+    const time = Date.now() + 60 * 60 * 1000;
+    const newExamEndTime = time;
+  
+    setTimeLeft(newExamEndTime - Date.now());
+    setIsRunning(false);
+    localStorage.setItem("countdown", encryptData(JSON.stringify({ timeLeft: newExamEndTime - Date.now(), isRunning: false })));
   };
 
   useEffect(() => {
-    if (!isRunning) return;
+    if (!isRunning || timeLeft <= 0) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
-        if (prevTime <= 1) {
+        if (prevTime <= 1000) {
           clearInterval(timer);
           setIsRunning(false);
+          setIsTimeUp(true);
           return 0;
         }
-        return prevTime - 1;
+        return prevTime - 1000;
       });
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isRunning]);
+  }, [isRunning, timeLeft]);
 
-  const totalTimeTaken = time - timeLeft;
+  const remainingTime = Math.floor(examEndTime - Date.now());
+  const totalTimeTaken = Math.floor(time - examEndTime);
 
-  const formatTime = (seconds: number) => {
+  const formatTime = (milliseconds: number) => {
+    const seconds = Math.floor(milliseconds / 1000);
+
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const remainingSeconds = seconds % 60;
@@ -91,11 +118,14 @@ export const CountdownProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         timeLeft,
         isRunning,
+        isTimeUp,
         startCountdown,
         stopCountdown,
         resetCountdown,
+        clearCountdown,
         formatTime,
         totalTimeTaken,
+        remainingTime,
       }}
     >
       {children}

@@ -1,64 +1,81 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import examQuestions from "../utils/examQuestions";
 import QuestionNavigation from "../components/QuestionNavigation";
 import Question, { QuestionType } from "../components/Question";
 import useVisibility from "../hooks/useVisibility";
 import useConnection from "../hooks/useConnection";
 import { useCountdown } from "../context/CountdownContext";
-import { useEffect } from "react";
-import disableTextActions from "../utils/disableTextAction";
-import useDetectSplitScreen from "../hooks/useDetectSplitSceen";
-// import detectDevTools from "../utils/detectDevTools";
 
 export default function TestPage() {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const currentId = parseInt(id || "0", 10);
-  
-  const { formatTime, timeLeft, stopCountdown, totalTimeTaken } = useCountdown();
-  
-  const question = examQuestions.find((q) => q.id === currentId);
-  
-  // detectDevTools();
-  disableTextActions();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [savedAnswers, setSavedAnswers] = useState<{ id: number; answer: string | null }[]>([]);
 
-  useDetectSplitScreen({
-    alertOnSplitScreen: false,
-    navigateToOnSplitScreen: `/completed?message=Anda terdeteksi kecurangan! Anda sedang menggunakan mode split screen! Ujian otomatis selesai.&time=${formatTime(totalTimeTaken)}`,
-  })
+  const { formatTime, timeLeft, totalTimeTaken } = useCountdown();
+  const question = examQuestions[currentIndex];
+
+  useEffect(() => {
+    const savedIndex = localStorage.getItem("examIndex");
+    if (savedIndex) {
+      setCurrentIndex(Number(savedIndex));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("examIndex", currentIndex.toString());
+  }, [currentIndex]);
 
   useVisibility({
-    onVisibilityHidden: () => {
-      stopCountdown();
-      navigate(
-        `/completed?message=Anda terdeteksi kecurangan! Anda telah berpindah ke tab/keluar dari ujian. Ujian otomatis selesai.&time=${formatTime(totalTimeTaken)}`
-      );
-    },
-    alertOnVisibilityHidden: false,
-    navigateToOnVisibilityHidden:
-      `/completed?message=Anda terdeteksi kecurangan! Anda telah berpindah ke tab/keluar dari ujian. Ujian otomatis selesai.&time=${formatTime(totalTimeTaken)}`,
+    alertOnVisibilityHidden: true,
   });
 
   useConnection({
-    onOnline: () => {
-      stopCountdown();
-      navigate(
-        `/completed?message=Anda terdeteksi kecurangan! Anda sedang online! Ujian otomatis selesai.&time=${formatTime(totalTimeTaken)}`
-      );
-    }, 
-    alertOnOnline: false,
-    navigateToOnOnline:
-      `/completed?message=Anda terdeteksi kecurangan! Anda sedang online! Ujian otomatis selesai.&time=${formatTime(totalTimeTaken)}`,
+    alertOnOnline: true,
   });
 
   useEffect(() => {
     if (timeLeft === 0) {
-      stopCountdown();
       navigate(
-        `/completed?message=Waktu ujian Anda telah habis. Ujian otomatis selesai.&time=${formatTime(totalTimeTaken)}`
+        `/completed?message=Waktu ujian Anda telah habis. Ujian otomatis selesai.&time=${formatTime(
+          totalTimeTaken
+        )}`
       );
     }
-  }, [timeLeft, navigate, stopCountdown]);
+  }, [timeLeft, navigate]);
+
+  useEffect(() => {
+    const savedAnswersFromStorage = localStorage.getItem("answersaved");
+    if (savedAnswersFromStorage) {
+      try {
+        const parsedAnswers = JSON.parse(savedAnswersFromStorage);
+        if (Array.isArray(parsedAnswers)) {
+          setSavedAnswers(parsedAnswers);
+        } else {
+          setSavedAnswers([]);
+        }
+      } catch (e) {
+        console.error("Error parsing saved answers from localStorage", e);
+        setSavedAnswers([]);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (savedAnswers.length > 0) {
+      localStorage.setItem("answersaved", JSON.stringify(savedAnswers));
+    }
+  }, [savedAnswers]);
+
+  const handleAnswerChange = (questionId: number, answer: string) => {
+    const updatedAnswers = savedAnswers.map((item) =>
+      item.id === questionId ? { ...item, answer } : item
+    );
+    if (!savedAnswers.some((item) => item.id === questionId)) {
+      updatedAnswers.push({ id: questionId, answer });
+    }
+    setSavedAnswers(updatedAnswers);
+  };
 
   if (!question) {
     return (
@@ -72,6 +89,13 @@ export default function TestPage() {
     );
   }
 
+  const handleNavigation = (newIndex: number) => {
+    const questionIndex = examQuestions.findIndex((q) => q.id === newIndex);
+    if (questionIndex >= 0 && questionIndex < examQuestions.length) {
+      setCurrentIndex(questionIndex);
+    }
+  };
+
   return (
     <div className="py-6 flex flex-col items-center bg-gray-200 min-h-screen">
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-[90%] w-full mb-6">
@@ -83,21 +107,20 @@ export default function TestPage() {
         </div>
         <hr className="my-4 opacity-15" />
         <Question
-          currentId={currentId}
-          handleNavigation={(newId: number) =>
-            navigate(newId >= 1 && newId <= examQuestions.length ? `/test/${newId}` : "/test/1")
-          }
+          currentId={currentIndex + 1}
+          handleNavigation={handleNavigation}
+          handleAnswerChange={handleAnswerChange}
           question={question as QuestionType}
           examQuestions={examQuestions as QuestionType[]}
+          savedAnswers={savedAnswers}
         />
       </div>
 
       <QuestionNavigation
-        currentId={currentId}
-        handleNavigation={(newId: number) =>
-          navigate(newId >= 1 && newId <= examQuestions.length ? `/test/${newId}` : "/test/1")
-        }
+        currentId={currentIndex + 1}
+        handleNavigation={handleNavigation}
         examQuestions={examQuestions as QuestionType[]}
+        savedAnswers={savedAnswers}
       />
     </div>
   );
