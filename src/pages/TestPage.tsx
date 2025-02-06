@@ -11,8 +11,8 @@ export default function TestPage() {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [savedAnswers, setSavedAnswers] = useState<{ id: number; answer: string | null }[]>([]);
-  const [isOnline, setIsOnline] = useState(navigator.onLine); // Cek status koneksi internet
-  const [isExamPaused, setIsExamPaused] = useState(navigator.onLine); // Hentikan ujian saat online
+  const [isOnline, setIsOnline] = useState(false); // Mulai dengan anggapan tidak ada internet
+  const [isExamPaused, setIsExamPaused] = useState(false);
 
   const { formatTime, timeLeft, totalTimeTaken } = useCountdown();
   const question = examQuestions[currentIndex];
@@ -76,11 +76,13 @@ export default function TestPage() {
     setSavedAnswers(updatedAnswers);
   };
 
-  // --- MENDETEKSI KONEKSI INTERNET ---
-  useEffect(() => {
-    const handleOnline = () => {
+  // --- CEK INTERNET DENGAN PING GOOGLE ---
+  const checkInternetConnection = async () => {
+    try {
+      const response = await fetch("https://www.google.com", { mode: "no-cors" });
       setIsOnline(true);
       setIsExamPaused(true);
+
       Swal.fire({
         icon: "warning",
         title: "Ujian Dihentikan!",
@@ -89,25 +91,45 @@ export default function TestPage() {
         allowOutsideClick: false,
         allowEscapeKey: false,
       });
-    };
-
-    const handleOffline = () => {
+    } catch (error) {
       setIsOnline(false);
       setIsExamPaused(false);
+
       Swal.fire({
         icon: "success",
         title: "Ujian Dilanjutkan!",
-        text: "Anda kembali offline. Ujian dapat dilanjutkan.",
+        text: "Anda tidak memiliki akses internet. Ujian dapat dilanjutkan.",
         confirmButtonColor: "#3085d6",
       });
+    }
+  };
+
+  useEffect(() => {
+    // Cek status internet saat pertama kali halaman dimuat
+    checkInternetConnection();
+
+    // Tambahkan event listener untuk mendeteksi perubahan status koneksi
+    const handleConnectionChange = () => {
+      if (navigator.onLine) {
+        checkInternetConnection();
+      } else {
+        setIsOnline(false);
+        setIsExamPaused(false);
+        Swal.fire({
+          icon: "success",
+          title: "Ujian Dilanjutkan!",
+          text: "Anda tidak memiliki akses internet. Ujian dapat dilanjutkan.",
+          confirmButtonColor: "#3085d6",
+        });
+      }
     };
 
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
+    window.addEventListener("online", handleConnectionChange);
+    window.addEventListener("offline", handleConnectionChange);
 
     return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
+      window.removeEventListener("online", handleConnectionChange);
+      window.removeEventListener("offline", handleConnectionChange);
     };
   }, []);
 
@@ -142,7 +164,6 @@ export default function TestPage() {
         </div>
         <hr className="my-4 opacity-15" />
 
-        {/* Tampilkan pesan jika ujian dihentikan */}
         {isExamPaused ? (
           <div className="text-center text-red-600 font-bold">
             <p>Ujian sedang dihentikan. Matikan koneksi internet untuk melanjutkan.</p>
@@ -159,7 +180,6 @@ export default function TestPage() {
         )}
       </div>
 
-      {/* Navigasi Soal Dinonaktifkan Jika Ujian Dihentikan */}
       {!isExamPaused && (
         <QuestionNavigation
           currentId={currentIndex + 1}
