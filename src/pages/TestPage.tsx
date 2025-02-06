@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2"; // Import SweetAlert
 import examQuestions from "../utils/examQuestions";
 import QuestionNavigation from "../components/QuestionNavigation";
 import Question, { QuestionType } from "../components/Question";
 import useVisibility from "../hooks/useVisibility";
-import useConnection from "../hooks/useConnection";
 import { useCountdown } from "../context/CountdownContext";
 
 export default function TestPage() {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [savedAnswers, setSavedAnswers] = useState<{ id: number; answer: string | null }[]>([]);
+  const [isOnline, setIsOnline] = useState(navigator.onLine); // Cek status koneksi internet
+  const [isExamPaused, setIsExamPaused] = useState(navigator.onLine); // Hentikan ujian saat online
 
   const { formatTime, timeLeft, totalTimeTaken } = useCountdown();
   const question = examQuestions[currentIndex];
@@ -28,10 +30,6 @@ export default function TestPage() {
 
   useVisibility({
     alertOnVisibilityHidden: true,
-  });
-
-  useConnection({
-    alertOnOnline: true,
   });
 
   useEffect(() => {
@@ -68,6 +66,7 @@ export default function TestPage() {
   }, [savedAnswers]);
 
   const handleAnswerChange = (questionId: number, answer: string) => {
+    if (isExamPaused) return; // Cegah perubahan jawaban jika ujian dihentikan
     const updatedAnswers = savedAnswers.map((item) =>
       item.id === questionId ? { ...item, answer } : item
     );
@@ -76,6 +75,41 @@ export default function TestPage() {
     }
     setSavedAnswers(updatedAnswers);
   };
+
+  // --- MENDETEKSI KONEKSI INTERNET ---
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      setIsExamPaused(true);
+      Swal.fire({
+        icon: "warning",
+        title: "Ujian Dihentikan!",
+        text: "Ujian dihentikan karena perangkat Anda terkoneksi ke internet. Matikan koneksi internet untuk melanjutkan ujian.",
+        confirmButtonColor: "#d33",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      });
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+      setIsExamPaused(false);
+      Swal.fire({
+        icon: "success",
+        title: "Ujian Dilanjutkan!",
+        text: "Anda kembali offline. Ujian dapat dilanjutkan.",
+        confirmButtonColor: "#3085d6",
+      });
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
 
   if (!question) {
     return (
@@ -90,6 +124,7 @@ export default function TestPage() {
   }
 
   const handleNavigation = (newIndex: number) => {
+    if (isExamPaused) return; // Cegah navigasi jika ujian dihentikan
     const questionIndex = examQuestions.findIndex((q) => q.id === newIndex);
     if (questionIndex >= 0 && questionIndex < examQuestions.length) {
       setCurrentIndex(questionIndex);
@@ -101,27 +136,38 @@ export default function TestPage() {
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-[90%] w-full mb-6">
         <div className="flex justify-between items-center">
           <p className="text-base font-semibold">Ujian Online</p>
-          <p className="text-sm font-medium text-red-600">
-            {formatTime(timeLeft)}
+          <p className={`text-sm font-medium ${isOnline ? "text-red-600" : "text-green-600"}`}>
+            {isOnline ? "Terkoneksi ke Internet (Ujian Dihentikan)" : "Offline (Ujian Berjalan)"}
           </p>
         </div>
         <hr className="my-4 opacity-15" />
-        <Question
+
+        {/* Tampilkan pesan jika ujian dihentikan */}
+        {isExamPaused ? (
+          <div className="text-center text-red-600 font-bold">
+            <p>Ujian sedang dihentikan. Matikan koneksi internet untuk melanjutkan.</p>
+          </div>
+        ) : (
+          <Question
+            currentId={currentIndex + 1}
+            handleNavigation={handleNavigation}
+            handleAnswerChange={handleAnswerChange}
+            question={question as QuestionType}
+            examQuestions={examQuestions as QuestionType[]}
+            savedAnswers={savedAnswers}
+          />
+        )}
+      </div>
+
+      {/* Navigasi Soal Dinonaktifkan Jika Ujian Dihentikan */}
+      {!isExamPaused && (
+        <QuestionNavigation
           currentId={currentIndex + 1}
           handleNavigation={handleNavigation}
-          handleAnswerChange={handleAnswerChange}
-          question={question as QuestionType}
           examQuestions={examQuestions as QuestionType[]}
           savedAnswers={savedAnswers}
         />
-      </div>
-
-      <QuestionNavigation
-        currentId={currentIndex + 1}
-        handleNavigation={handleNavigation}
-        examQuestions={examQuestions as QuestionType[]}
-        savedAnswers={savedAnswers}
-      />
+      )}
     </div>
   );
 }
